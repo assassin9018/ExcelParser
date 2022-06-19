@@ -24,16 +24,19 @@ namespace ExcelParser
             cells[1, 5].Value = _settings.BarcodeHeader;
 
             int iterator = 2;
-            foreach (var row in rows)
+            foreach (var group in rows.GroupBy(x => x.VendorCode1).Select(g => g.ToList()))
             {
-                cells[iterator, 1].Value = row.VendorCode1;
-                cells[iterator, 2].Value = row.VendorCode2;
-                cells[iterator, 3].Value = row.Name;
-                cells[iterator, 4].Value = row.Count;
-                cells[iterator, 5].Value = row.Barcode;
+                foreach (var row in group)
+                {
+                    cells[iterator, 1].Value = row.VendorCode1;
+                    cells[iterator, 2].Value = row.VendorCode2;
+                    cells[iterator, 3].Value = row.Name;
+                    cells[iterator, 4].Value = row.Count;
+                    cells[iterator, 5].Value = row.Barcode;
+                    iterator++;
+                }
                 iterator++;
             }
-
             string dir = Path.GetDirectoryName(_settings.SolutionFileName) ?? string.Empty;
             if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
