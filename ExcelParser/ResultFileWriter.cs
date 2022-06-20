@@ -23,6 +23,9 @@ namespace ExcelParser
             cells[1, 4].Value = _settings.CountHeader;
             cells[1, 5].Value = _settings.BarcodeHeader;
 
+            for (int i = 1; i <= 5; i++)
+                worksheet.Column(i).StyleName = "Text";
+
             int iterator = 2;
             foreach (var group in rows.GroupBy(x => x.VendorCode1).Select(g => g.ToList()))
             {
@@ -32,11 +35,15 @@ namespace ExcelParser
                     cells[iterator, 2].Value = row.VendorCode2;
                     cells[iterator, 3].Value = row.Name;
                     cells[iterator, 4].Value = row.Count;
-                    cells[iterator, 5].Value = row.Barcode;
+                    cells[iterator, 5].Value = row.Barcode.PadLeft(11, '0');
                     iterator++;
                 }
                 iterator++;
             }
+
+            for (int i = 1; i <= 5; i++)
+                worksheet.Column(i).AutoFit();
+
             string dir = Path.GetDirectoryName(_settings.SolutionFileName) ?? string.Empty;
             if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
