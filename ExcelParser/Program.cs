@@ -29,6 +29,9 @@ try
             resultWriter.Write(rows, Path.GetFileNameWithoutExtension(fileName));
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Файл - {fileName} обработан.");
+            File.Delete(fileName);
+            Console.WriteLine($"Файл - {fileName} удалён.");
+
         }
         catch (Exception ex)
         {

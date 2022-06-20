@@ -27,6 +27,6 @@ namespace ExcelParser
         /// <summary>
         /// Штрих-код
         /// </summary>
-        public string Barcode { get; set; } = "000000000000";
+        public string Barcode { get; set; } = "00000000000";
     }
 }
