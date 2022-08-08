@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using ExcelParser.Models;
+using OfficeOpenXml;
 
 namespace ExcelParser
 {
@@ -17,41 +18,43 @@ namespace ExcelParser
             ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(_settings.WorksheetName);
 
             var cells = worksheet.Cells;
-            cells[1, 1].Value = _settings.VendorCode1Header;
-            cells[1, 2].Value = _settings.VendorCode2Header;
-            cells[1, 3].Value = _settings.NameHeader;
-            cells[1, 4].Value = _settings.CountHeader;
-            cells[1, 5].Value = _settings.BarcodeHeader;
+            cells[1, 1].Value = _settings.VendorCode2Header;
+            cells[1, 2].Value = _settings.NameHeader;
+            cells[1, 3].Value = _settings.CountHeader;
+            cells[1, 4].Value = _settings.BarcodeHeader;
 
-            for (int i = 1; i <= 5; i++)
+            for (int i = 1; i <= 4; i++)
                 worksheet.Column(i).StyleName = "Text";
 
             int iterator = 2;
-            foreach (var group in rows.GroupBy(x => x.VendorCode1).Select(g => g.ToList()))
+            foreach (var row in rows)
             {
-                foreach (var row in group)
-                {
-                    cells[iterator, 1].Value = row.VendorCode1;
-                    cells[iterator, 2].Value = row.VendorCode2;
-                    cells[iterator, 3].Value = row.Name;
-                    cells[iterator, 4].Value = row.Count;
-                    cells[iterator, 5].Value = row.Barcode.PadLeft(11, '0');
-                    iterator++;
-                }
+                cells[iterator, 1].Value = row.VendorCode2;
+                cells[iterator, 2].Value = row.Name;
+                cells[iterator, 3].Value = row.Count;
+                cells[iterator, 4].Value = row.Barcode.PadLeft(11, '0');
                 iterator++;
             }
 
             for (int i = 1; i <= 5; i++)
                 worksheet.Column(i).AutoFit();
 
-            string dir = Path.GetDirectoryName(_settings.SolutionFileName) ?? string.Empty;
+            string dir = Path.GetDirectoryName(_settings.SolutionFolder) ?? string.Empty;
             if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
-            string fileName = Path.Combine(dir, sourceFileName + " - " + Path.GetFileName(_settings.SolutionFileName));
+            string fileName = GetFileName(sourceFileName, dir);
             if (File.Exists(fileName))
                 File.Delete(fileName);
 
             package.SaveAs(fileName);
+        }
+
+        private string GetFileName(string sourceFileName, string dir)
+        {
+            string prefix = _settings.SolutionFileNamePrefix;
+            string timeStamp = $" {DateTime.Now:dd.MM.yyyy HH-mm-ss}";
+            string suffix = _settings.SolutionFileNameSuffix;
+            return Path.Combine(dir, prefix + sourceFileName + timeStamp + suffix) + ".xlsx";
         }
     }
 }

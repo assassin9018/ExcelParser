@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ExcelParser
+﻿namespace ExcelParser.Models
 {
-    internal class ResultTableRow
+    internal class ResultTableRow : ProductItem
     {
         /// <summary>
-        /// Артикул 1
+        /// Штрих-код
         /// </summary>
-        public string VendorCode1 { get; set; } = string.Empty;
+        public string Barcode { get; set; } = string.Empty;
+    }
+
+    internal class ProductItem
+    {
         /// <summary>
         /// Артикул 2
         /// </summary>
@@ -24,9 +22,5 @@ namespace ExcelParser
         /// Количество
         /// </summary>
         public int Count { get; set; } = 0;
-        /// <summary>
-        /// Штрих-код
-        /// </summary>
-        public string Barcode { get; set; } = "00000000000";
     }
 }

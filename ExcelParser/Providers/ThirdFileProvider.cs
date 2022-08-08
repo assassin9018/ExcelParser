@@ -1,17 +1,20 @@
-﻿using OfficeOpenXml;
+﻿using ExcelParser.Models;
+using OfficeOpenXml;
 
 namespace ExcelParser.Providers
 {
     internal class ThirdFileProvider : ExcelProviderBase
     {
         private readonly ThirdDocument _cfs;
+        private readonly string _defaultBarcode;
 
         public ThirdFileProvider(Settings settings)
         {
             _cfs = settings.ThirdDocument;
+            _defaultBarcode = settings.SolutionDocument.DefaultBarcode;
         }
 
-        internal void AppendBarcodes(List<ResultTableRow> rows)
+        internal List<ResultTableRow> AppendBarcodes(List<ProductItem> rows)
         {
             using var package = new ExcelPackage(_cfs.FileName);
 
@@ -34,11 +37,14 @@ namespace ExcelParser.Providers
             }
             //vendorcodes.ToDictionary(k => k.value, v => GetStringFromCell(cells[v.row, _cfs.BarcodeColumnNumber]));
 
-            foreach (ResultTableRow row in rows)
+
+            return rows.Select(x => new ResultTableRow()
             {
-                if (barByVendorCodes.TryGetValue(row.VendorCode2, out string barcode))
-                    row.Barcode = barcode;
-            }
+                VendorCode2 = x.VendorCode2,
+                Count = x.Count,
+                Name = x.Name,
+                Barcode = barByVendorCodes.TryGetValue(x.VendorCode2, out string barcode) ? barcode : _defaultBarcode,
+            }).ToList();
         }
     }
 }
