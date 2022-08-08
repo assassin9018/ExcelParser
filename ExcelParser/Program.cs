@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using ExcelParser;
+using ExcelParser.Models;
 using ExcelParser.Providers;
 using OfficeOpenXml;
 
@@ -11,6 +12,7 @@ try
     var settings = Settings.Load();
     FirstFileProvider firstProvider = new(settings);
     SecondFileProvider secondProvider = new(settings);
+    GroupedByVendorCode2Provider groupProvider = new();
     ThirdFileProvider thirdProvider = new(settings);
     ResultFileWriter resultWriter = new(settings);
 
@@ -23,10 +25,11 @@ try
         try
         {
             List<string> vendorcodes = firstProvider.LoadVendorCodes(fileName);
-            List<ResultTableRow> rows = secondProvider.LoadRowsWith(vendorcodes);
-            thirdProvider.AppendBarcodes(rows);
+            List<ProductItem> items = secondProvider.LoadRowsWith(vendorcodes);
+            List<ProductItem> groupedItems = groupProvider.ApplyGrouping(items);
+            List<ResultTableRow> resultRows = thirdProvider.AppendBarcodes(groupedItems);
 
-            resultWriter.Write(rows, Path.GetFileNameWithoutExtension(fileName));
+            resultWriter.Write(resultRows, Path.GetFileNameWithoutExtension(fileName));
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Файл - {fileName} обработан.");
             File.Delete(fileName);

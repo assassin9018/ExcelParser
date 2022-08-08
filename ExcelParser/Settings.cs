@@ -133,12 +133,14 @@ namespace ExcelParser
 
     public class SolutionDocument
     {
+        public string DefaultBarcode { get; set; } = "00000000000";
         public string WorksheetName { get; set; } = "Todo add name";
-        public string VendorCode1Header { get; set; } = "Артикул 1";
         public string VendorCode2Header { get; set; } = "Артикул 2";
         public string NameHeader { get; set; } = "Наименование";
         public string CountHeader { get; set; } = "Количество";
         public string BarcodeHeader { get; set; } = "Штрих-код";
-        public string SolutionFileName { get; set; } = "Examples\\4.xlsx";
+        public string SolutionFolder { get; set; } = "Solutions\\";
+        public string SolutionFileNamePrefix { get; set; } = "S.";
+        public string SolutionFileNameSuffix { get; set; } = "_";
     }
 }
