@@ -2,6 +2,7 @@
 using ExcelParser;
 using ExcelParser.Models;
 using ExcelParser.Providers;
+using ExcelParser.Writers;
 using OfficeOpenXml;
 
 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -14,7 +15,8 @@ try
     SecondFileProvider secondProvider = new(settings);
     GroupedByVendorCode2Provider groupProvider = new();
     ThirdFileProvider thirdProvider = new(settings);
-    ResultFileWriter resultWriter = new(settings);
+    ResultExcelWriter resultWriter = new(settings);
+    ResultCsvWriter csvWriter = new(settings);
 
     var filesForParsing = Directory.EnumerateFiles(settings.FirstDocument.FodlerName)
         .Where(x => supportedExtentions.Any(s => s.Equals(Path.GetExtension(x), StringComparison.CurrentCultureIgnoreCase)));

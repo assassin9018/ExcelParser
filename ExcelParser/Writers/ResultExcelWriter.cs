@@ -1,13 +1,13 @@
 ﻿using ExcelParser.Models;
 using OfficeOpenXml;
 
-namespace ExcelParser
+namespace ExcelParser.Writers
 {
-    internal class ResultFileWriter
+    internal class ResultExcelWriter
     {
         private SolutionDocument _settings;
 
-        public ResultFileWriter(Settings settings)
+        public ResultExcelWriter(Settings settings)
         {
             _settings = settings.SolutionDocument;
         }

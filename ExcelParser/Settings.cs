@@ -6,9 +6,9 @@ using System.Text.Unicode;
 
 namespace ExcelParser
 {
-    internal partial class Settings
+    internal class Settings
     {
-        private static readonly JsonSerializerOptions _serializerOptions = new(JsonSerializerDefaults.General)
+        private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.General)
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.Never,
             MaxDepth = 10,
@@ -34,7 +34,7 @@ namespace ExcelParser
             {
                 settings = File.Exists(SettingsFileName)
                     //? (JsonSerializer.Deserialize(File.ReadAllText(SettingsFileName), typeof(Settings), ExcelParserContext.Default) as Settings) ?? new()
-                    ? JsonSerializer.Deserialize<Settings>(File.ReadAllText(SettingsFileName), _serializerOptions) ?? new()
+                    ? JsonSerializer.Deserialize<Settings>(File.ReadAllText(SettingsFileName), SerializerOptions) ?? new()
                     : new Settings();
             }
             catch
@@ -52,41 +52,13 @@ namespace ExcelParser
         {
             try
             {
-                string json = JsonSerializer.Serialize(this, _serializerOptions);
+                string json = JsonSerializer.Serialize(this, SerializerOptions);
                 File.WriteAllText(SettingsFileName, json);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
             }
-        }
-
-        public static Settings Change()
-        {
-            int command = -1;
-            ShowCommands();
-            var settings = Load();
-            do
-            {
-                command = int.TryParse(Console.ReadLine(), out int value) ? value : -1;
-                switch (command)
-                {
-                    case 1:
-                        settings.Save();
-                        break;
-                }
-            } while (command != 0 && command != 1);
-
-            return Load();
-        }
-
-        private static void ShowCommands()
-        {
-            Console.WriteLine("0 - отменить");
-            Console.WriteLine("1 - сохранить");
-            Console.WriteLine("2 - столбец первого файла");
-            Console.WriteLine("3 - столбец второго файла");
-            Console.WriteLine("4 - столбец третьего файла");
         }
     }
 
