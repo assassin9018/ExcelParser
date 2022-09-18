@@ -15,6 +15,7 @@ namespace ExcelParser
             WriteIndented = true,
             Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic),
         };
+
         private const string SettingsFileName = "settings.json";
 
         public FirstDocument FirstDocument { get; set; } = new();
@@ -105,6 +106,8 @@ namespace ExcelParser
 
     public class SolutionDocument
     {
+        public bool OutExcel { get; set; } = true;
+        public bool OutDm { get; set; } = true;
         public string DefaultBarcode { get; set; } = "00000000000";
         public string WorksheetName { get; set; } = "Todo add name";
         public string VendorCode2Header { get; set; } = "Артикул 2";

@@ -15,7 +15,7 @@ try
     SecondFileProvider secondProvider = new(settings);
     GroupedByVendorCode2Provider groupProvider = new();
     ThirdFileProvider thirdProvider = new(settings);
-    ResultExcelWriter resultWriter = new(settings);
+    ResultExcelWriter excelWriter = new(settings);
     ResultCsvWriter csvWriter = new(settings);
 
     var filesForParsing = Directory.EnumerateFiles(settings.FirstDocument.FodlerName)
@@ -31,7 +31,11 @@ try
             List<ProductItem> groupedItems = groupProvider.ApplyGrouping(items);
             List<ResultTableRow> resultRows = thirdProvider.AppendBarcodes(groupedItems);
 
-            resultWriter.Write(resultRows, Path.GetFileNameWithoutExtension(fileName));
+            string fileNameWithoutExtention = Path.GetFileNameWithoutExtension(fileName);
+            if (settings.SolutionDocument.OutExcel)
+                excelWriter.Write(resultRows, fileNameWithoutExtention);
+            if (settings.SolutionDocument.OutDm)
+                csvWriter.Write(resultRows, fileNameWithoutExtention);
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Файл - {fileName} обработан.");
             File.Delete(fileName);

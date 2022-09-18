@@ -48,7 +48,7 @@ internal class ResultCsvWriter
         //ИдентификаторДокумента
         writer.WriteField(Guid.NewGuid());
         //НомерДокумента
-        writer.WriteField((int)(DateTime.Now - new DateTime(2020, 0, 0)).TotalSeconds);
+        writer.WriteField((int)(DateTime.Now - new DateTime(2020, 1, 1)).TotalSeconds);
         //ДатаДокумента
         writer.WriteField(generationTime);
         //ШтрихКодДокумента
