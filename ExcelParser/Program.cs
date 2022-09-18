@@ -16,7 +16,7 @@ try
     GroupedByVendorCode2Provider groupProvider = new();
     ThirdFileProvider thirdProvider = new(settings);
     ResultExcelWriter excelWriter = new(settings);
-    ResultCsvWriter csvWriter = new(settings);
+    ResultDmWriter csvWriter = new(settings);
 
     var filesForParsing = Directory.EnumerateFiles(settings.FirstDocument.FodlerName)
         .Where(x => supportedExtentions.Any(s => s.Equals(Path.GetExtension(x), StringComparison.CurrentCultureIgnoreCase)));

@@ -5,13 +5,14 @@ using ExcelParser.Models;
 
 namespace ExcelParser.Writers;
 
-internal class ResultCsvWriter
+internal class ResultDmWriter
 {
+    private const string Extention = ".dm";
     private static readonly string EmptyBarCode = string.Concat(Enumerable.Range(0, 13).Select(x=>'0').ToArray());
     private readonly SolutionDocument _settings;
     private readonly CsvConfiguration _configuration;
 
-    public ResultCsvWriter(Settings settings)
+    public ResultDmWriter(Settings settings)
     {
         _settings = settings.SolutionDocument;
         _configuration = new CsvConfiguration(CultureInfo.CurrentCulture)
@@ -141,7 +142,7 @@ internal class ResultCsvWriter
         string prefix = _settings.SolutionFileNamePrefix;
         string timeStamp = $" {DateTime.Now:dd.MM.yyyy HH-mm-ss}";
         string suffix = _settings.SolutionFileNameSuffix;
-        string fileName =  Path.Combine(dir, prefix + sourceFileName + timeStamp + suffix) + ".csv";
+        string fileName =  Path.Combine(dir, prefix + sourceFileName + timeStamp + suffix) + Extention;
         
         if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
             Directory.CreateDirectory(dir);
