@@ -108,14 +108,16 @@ namespace ExcelParser
     {
         public bool OutExcel { get; set; } = true;
         public bool OutDm { get; set; } = true;
-        public string DefaultBarcode { get; set; } = "00000000000";
+        public int BarcodeLength { get; set; } = 12;
         public string WorksheetName { get; set; } = "Todo add name";
         public string VendorCode2Header { get; set; } = "Артикул 2";
         public string NameHeader { get; set; } = "Наименование";
         public string CountHeader { get; set; } = "Количество";
         public string BarcodeHeader { get; set; } = "Штрих-код";
-        public string SolutionFolder { get; set; } = "Solutions\\";
+        public string ExcelFolder { get; set; } = "ExcelSolutions\\";
+        public string DmFolder { get; set; } = "DmSolutions\\";
         public string SolutionFileNamePrefix { get; set; } = "S.";
         public string SolutionFileNameSuffix { get; set; } = "_";
+        public int Iterator { get; set; }
     }
 }

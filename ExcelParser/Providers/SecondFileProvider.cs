@@ -46,7 +46,7 @@ namespace ExcelParser.Providers
                         {
                             VendorCode2 = string.IsNullOrWhiteSpace(item.VendorCode2) ? item.Name : item.VendorCode2,
                             Count = item.Count,
-                            Name = string.IsNullOrWhiteSpace(item.VendorCode2) ? $"Для \"{item.Name}\" не задан Артикул 2. " : item.Name,
+                            Name = item.Name,
                         });
                     }
                 else

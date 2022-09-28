@@ -32,14 +32,14 @@ namespace ExcelParser.Writers
                 cells[iterator, 1].Value = row.VendorCode2;
                 cells[iterator, 2].Value = row.Name;
                 cells[iterator, 3].Value = row.Count;
-                cells[iterator, 4].Value = row.Barcode.PadLeft(11, '0');
+                cells[iterator, 4].Value = row.Barcode;
                 iterator++;
             }
 
             for (int i = 1; i <= 5; i++)
                 worksheet.Column(i).AutoFit();
 
-            string dir = Path.GetDirectoryName(_settings.SolutionFolder) ?? string.Empty;
+            string dir = Path.GetDirectoryName(_settings.ExcelFolder) ?? string.Empty;
             if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
             string fileName = GetFileName(sourceFileName, dir);

@@ -40,7 +40,7 @@ try
             Console.WriteLine($"Файл - {fileName} обработан.");
             File.Delete(fileName);
             Console.WriteLine($"Файл - {fileName} удалён.");
-
+            Increment(settings);
         }
         catch (Exception ex)
         {
@@ -59,3 +59,10 @@ catch (Exception ex)
     Console.WriteLine(ex.Message);
 }
 Console.ReadKey();
+
+
+static void Increment(Settings settings)
+{
+    settings.SolutionDocument.Iterator++;
+    settings.Save();
+}

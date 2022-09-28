@@ -49,7 +49,7 @@ internal class ResultDmWriter
         //ИдентификаторДокумента
         writer.WriteField(Guid.NewGuid());
         //НомерДокумента
-        writer.WriteField((int)(DateTime.Now - new DateTime(2020, 1, 1)).TotalSeconds);
+        writer.WriteField($"БПРЦ-{_settings.Iterator.ToString().PadLeft(6, '0')}");
         //ДатаДокумента
         writer.WriteField(generationTime);
         //ШтрихКодДокумента
@@ -72,6 +72,7 @@ internal class ResultDmWriter
         // writer.WriteField("");
         // //Склад2
         // writer.WriteField("");
+        writer.NextRecord();
     }
 
     private void WriteTeplate(CsvWriter writer, int unknownValue)
@@ -120,7 +121,7 @@ internal class ResultDmWriter
             //S|I - S
             writer.WriteField("S");
             //ИдентификаторТовара - 8U-b0380245-9e62-11ea-979a-341a4c11505600000000-0000-0000-0000-000000000000
-            writer.WriteField(row.Name);
+            writer.WriteField(row.VendorCode2);
             //ШтрихкодТовара - 5201409809378
             writer.WriteField(row.Barcode);
             //ШтрихКодЯчейки - 
@@ -137,19 +138,16 @@ internal class ResultDmWriter
 
     private string GetFileName(string sourceFileName)
     {
-        string dir = Path.GetDirectoryName(_settings.SolutionFolder) ?? string.Empty;
-        
-        string prefix = _settings.SolutionFileNamePrefix;
-        string timeStamp = $" {DateTime.Now:dd.MM.yyyy HH-mm-ss}";
-        string suffix = _settings.SolutionFileNameSuffix;
-        string fileName =  Path.Combine(dir, prefix + sourceFileName + timeStamp + suffix) + Extention;
+        string dir = Path.GetDirectoryName(_settings.DmFolder) ?? string.Empty;
+        string fileName = $"19102020184919_v83_Doc_БПРЦ-{_settings.Iterator.ToString().PadLeft(6, '0')}";
+        string fullName = Path.Combine(dir, fileName + Extention); 
         
         if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
             Directory.CreateDirectory(dir);
-        if (File.Exists(fileName))
-            File.Delete(fileName);
+        if (File.Exists(fullName))
+            File.Delete(fullName);
 
-        return fileName;
+        return fullName;
     }
 
     private static void AddIdenticalValues<T>(CsvWriter writer, int valuesCount, T value)

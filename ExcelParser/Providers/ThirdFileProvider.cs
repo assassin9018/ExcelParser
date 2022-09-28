@@ -7,11 +7,13 @@ namespace ExcelParser.Providers
     {
         private readonly ThirdDocument _cfs;
         private readonly string _defaultBarcode;
+        private readonly int _barcodeLength;
 
         public ThirdFileProvider(Settings settings)
         {
             _cfs = settings.ThirdDocument;
-            _defaultBarcode = settings.SolutionDocument.DefaultBarcode;
+            _barcodeLength = settings.SolutionDocument.BarcodeLength;
+            _defaultBarcode = "".PadLeft(_barcodeLength, '0');
         }
 
         internal List<ResultTableRow> AppendBarcodes(List<ProductItem> rows)
@@ -43,8 +45,15 @@ namespace ExcelParser.Providers
                 VendorCode2 = x.VendorCode2,
                 Count = x.Count,
                 Name = x.Name,
-                Barcode = barByVendorCodes.TryGetValue(x.VendorCode2, out string barcode) ? barcode : _defaultBarcode,
+                Barcode = GetBarcode(barByVendorCodes, x),
             }).ToList();
+        }
+
+        private string GetBarcode(Dictionary<string, string> barByVendorCodes, ProductItem x)
+        {
+            if (barByVendorCodes.TryGetValue(x.VendorCode2, out string barcode))
+                return barcode.PadLeft(_barcodeLength, '0');
+            return _defaultBarcode;
         }
     }
 }
