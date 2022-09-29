@@ -4,6 +4,15 @@ namespace ExcelParser.Providers
 {
     internal class ExcelProviderBase
     {
+        protected static ExcelRange GetCells(ExcelPackage package, string? worksheetName)
+        {
+            return worksheetName is null ?
+                package.Workbook.Worksheets.First().Cells :
+                package.Workbook.Worksheets.First(x
+                        =>x.Name.Equals(worksheetName, StringComparison.CurrentCultureIgnoreCase))
+                    .Cells;
+        }
+        
         protected static List<(int row, string value)> LoadAllCellsFromColumn(ExcelRange cells, int column)
         {
             return cells.Where(x => x.Start.Column == column)

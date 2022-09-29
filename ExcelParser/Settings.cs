@@ -69,12 +69,14 @@ namespace ExcelParser
         public int VendorCodeColumnNumber { get; set; }
         public string? WorksheetName { get; set; }
         public List<string> WordsFilter { get; set; }
+        public int ColorColumnNumber { get; set; }
 
         public FirstDocument()
         {
             FodlerName = "Orders\\";
             VendorCodeColumnNumber = 3;
-            WorksheetName = "ДСП";
+            ColorColumnNumber = 11;
+            WorksheetName = "Фасады";
             WordsFilter = new()
             {
                 "Категория в базе не найдена Материал не найден",
@@ -88,7 +90,6 @@ namespace ExcelParser
         public string FileName { get; set; } = "Examples\\2.xlsx";
         public string? WorksheetName { get; set; } = null;
 
-
         public int VendorCode1ColumnNumber { get; set; } = 1;
         public int VendorCode2ColumnNumber { get; set; } = 2;
         public int NameColumnNumber { get; set; } = 3;
@@ -97,11 +98,17 @@ namespace ExcelParser
 
     public class ThirdDocument
     {
-        public string FileName { get; set; } = "Examples\\3.xlsx";
-        public string? WorksheetName { get; set; } = null;
-
+        public string FileName { get; set; } = "Examples/3.xlsx";
+        
+        public string? BarcodeWorksheetName { get; set; } = null;
         public int VendorCode2ColumnNumber { get; set; } = 2;
         public int BarcodeColumnNumber { get; set; } = 4;
+        
+        
+        public string? ColorWorksheetName { get; set; } = "Цвета";
+        public int ColorColumnNumber { get; set; } = 1;
+        public int ColorSuffixColumnNumber { get; set; } = 3;
+        public List<string> ColoredItemsPrefixes { get; set; } = new() { "F", "T" };
     }
 
     public class SolutionDocument

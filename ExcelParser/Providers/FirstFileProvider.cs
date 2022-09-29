@@ -1,5 +1,5 @@
 ﻿using OfficeOpenXml;
-using System.Runtime;
+using ExcelParser.Models;
 
 namespace ExcelParser.Providers
 {
@@ -12,21 +12,24 @@ namespace ExcelParser.Providers
             _cfs = settings.FirstDocument;
         }
 
-        public List<string> LoadVendorCodes(string fileName)
+        public List<Product> LoadVendorCodes(string fileName)
         {
             using var package = new ExcelPackage(fileName);
 
-            var cells = _cfs.WorksheetName is null ?
-                package.Workbook.Worksheets.First().Cells :
-                package.Workbook.Worksheets.First(x=>x.Name.Equals(_cfs.WorksheetName, StringComparison.CurrentCultureIgnoreCase)).Cells;
+            var cells = GetCells(package, _cfs.WorksheetName);
 
             int column = _cfs.VendorCodeColumnNumber;
             var valuesWithRows = LoadAllCellsFromColumn(cells, column);
             var filter = _cfs.WordsFilter;
 
             return valuesWithRows
-                .Select(x => x.value)
-                .Where(x => !filter.Any(sw => sw.Equals(x, StringComparison.CurrentCultureIgnoreCase)))
+                .Where(x => !filter.Any(sw => sw.Equals(x.value, StringComparison.CurrentCultureIgnoreCase)))
+                .Select(x => new Product
+                {
+                    VendorCode1 = x.value,
+                    Color = GetStringFromCell(cells[x.row + 1, _cfs.ColorColumnNumber]),
+                    Items = new()
+                })
                 .ToList();
         }
     }

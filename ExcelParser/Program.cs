@@ -18,7 +18,8 @@ try
     ResultExcelWriter excelWriter = new(settings);
     ResultDmWriter csvWriter = new(settings);
 
-    var filesForParsing = Directory.EnumerateFiles(settings.FirstDocument.FodlerName)
+    string ordersFolder = Path.Combine(Directory.GetCurrentDirectory(), settings.FirstDocument.FodlerName);
+    var filesForParsing = Directory.EnumerateFiles(ordersFolder)
         .Where(x => supportedExtentions.Any(s => s.Equals(Path.GetExtension(x), StringComparison.CurrentCultureIgnoreCase)));
 
     foreach (var fileName in filesForParsing)
@@ -26,10 +27,10 @@ try
         Console.ForegroundColor = ConsoleColor.White;
         try
         {
-            List<string> vendorcodes = firstProvider.LoadVendorCodes(fileName);
-            List<ProductItem> items = secondProvider.LoadRowsWith(vendorcodes);
-            List<ProductItem> groupedItems = groupProvider.ApplyGrouping(items);
-            List<ResultTableRow> resultRows = thirdProvider.AppendBarcodes(groupedItems);
+            List<Product> products = firstProvider.LoadVendorCodes(fileName);
+            secondProvider.AppendItems(products);
+            thirdProvider.AppendBarcodesByColors(products);
+            List<ResultTableRow> resultRows = groupProvider.ApplyGrouping(products.SelectMany(x=>x.Items));
 
             string fileNameWithoutExtention = Path.GetFileNameWithoutExtension(fileName);
             if (settings.SolutionDocument.OutExcel)

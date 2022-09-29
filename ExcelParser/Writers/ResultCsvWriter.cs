@@ -49,9 +49,10 @@ internal class ResultDmWriter
         //ИдентификаторДокумента
         writer.WriteField(Guid.NewGuid());
         //НомерДокумента
-        writer.WriteField($"БПРЦ-{_settings.Iterator.ToString().PadLeft(6, '0')}");
+        string bprc = $"БПРЦ-{_settings.Iterator.ToString().PadLeft(6, '0')}";
+        writer.WriteField(bprc);
         //ДатаДокумента
-        writer.WriteField(generationTime);
+        writer.WriteField($"{generationTime:yyyy-MM-dd hh:mm:ss}.000");
         //ШтрихКодДокумента
         writer.WriteField(EmptyBarCode);
         //КомментарийДокумента
@@ -61,7 +62,7 @@ internal class ResultDmWriter
         //Склад
         writer.WriteField("");
         // //ИНН
-        // writer.WriteField("");
+        //writer.WriteField("");
         // //РодительскийДокумент
         // writer.WriteField("");
         // //IDРодительского
@@ -72,6 +73,8 @@ internal class ResultDmWriter
         // writer.WriteField("");
         // //Склад2
         // writer.WriteField("");
+        //Пустое поле чтобы появилась точка с запятой
+        writer.WriteField("");
         writer.NextRecord();
     }
 
@@ -94,9 +97,9 @@ internal class ResultDmWriter
         writer.WriteField("Перемещение");
         writer.WriteField("ПеремещениеТоваров");
         AddIdenticalValues(writer, 1, 1);
-        AddIdenticalValues(writer, 4, 0);
+        AddIdenticalValues(writer, 5, 0);
         AddIdenticalValues(writer, 2, 1);
-        AddIdenticalValues(writer, 4, 0);
+        AddIdenticalValues(writer, 5, 0);
         AddIdenticalValues(writer, 1, 1);
         AddIdenticalValues(writer, 2, 0);
         AddIdenticalValues(writer, 2, 1);
@@ -105,6 +108,7 @@ internal class ResultDmWriter
         AddIdenticalValues(writer, 28, 0);
         AddIdenticalValues(writer, 2, "");
         AddIdenticalValues(writer, 7, 0);
+        AddIdenticalValues(writer, 1, "");
         writer.NextRecord();
     }
 
@@ -132,6 +136,7 @@ internal class ResultDmWriter
             writer.WriteField(row.Count);
             //Лимит
             writer.WriteField(row.Count);
+            writer.WriteField("");
             writer.NextRecord();
         }
     }

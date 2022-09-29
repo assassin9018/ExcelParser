@@ -16,37 +16,68 @@ namespace ExcelParser.Providers
             _defaultBarcode = "".PadLeft(_barcodeLength, '0');
         }
 
-        internal List<ResultTableRow> AppendBarcodes(List<ProductItem> rows)
+        internal void AppendBarcodesByColors(List<Product> products)
         {
             using var package = new ExcelPackage(_cfs.FileName);
 
-            var cells = _cfs.WorksheetName is null ?
-                package.Workbook.Worksheets.First().Cells :
-                package.Workbook.Worksheets.First(x => x.Name.Equals(_cfs.WorksheetName, StringComparison.CurrentCultureIgnoreCase)).Cells;
+            var barcodeByVendor = LoadBarcodesDictionary(package);
+            var colorSuffixes = LoadColorSuffixes(package);
+
+            var cips = _cfs.ColoredItemsPrefixes;
+            foreach (var product in products)
+            {
+                Color? color = colorSuffixes.FirstOrDefault(x=>x.Name.Equals(product.Color, StringComparison.OrdinalIgnoreCase));
+                if(color is null)
+                    continue;
+                
+                var items = product.Items;
+                for (int i = 0; i < items.Count; i++)
+                {
+                    var current = items[i];
+                    if (cips.Any(x => current.VendorCode2.StartsWith(x, StringComparison.OrdinalIgnoreCase)))
+                        items[i] = current with { VendorCode2 = current.VendorCode2 + color.Suffix };
+                }
+            }
+
+            foreach (var product in products)
+            {
+                var items = product.Items;
+                for (int i = 0; i < items.Count; i++)
+                    items[i] = items[i] with { Barcode = GetBarcode(barcodeByVendor, items[i]) };
+
+            }
+        }
+
+        private Dictionary<string, string> LoadBarcodesDictionary(ExcelPackage package)
+        {
+            var cells = GetCells(package, _cfs.BarcodeWorksheetName);
 
             int column = _cfs.VendorCode2ColumnNumber;
             List<(int row, string value)> vendorcodes = LoadAllCellsFromColumn(cells, column);
 
             //ZSKHS40 артикул совпадает
-            Dictionary<string, string> barByVendorCodes = new();
+            Dictionary<string, string> barcodeByVendor = new();
             foreach (var codeWithRow in vendorcodes)
             {
                 string barcode = GetStringFromCell(cells[codeWithRow.row, _cfs.BarcodeColumnNumber]);
-                if (barByVendorCodes.TryGetValue(codeWithRow.value, out string existed))
-                    Console.WriteLine($"Для артикула {codeWithRow.value} штрих-код уже сохранён. Использован - {existed}, пропущен - {barcode}.");
+                if (barcodeByVendor.TryGetValue(codeWithRow.value, out string existed))
+                    Console.WriteLine(
+                        $"Для артикула {codeWithRow.value} штрих-код уже сохранён. Использован - {existed}, пропущен - {barcode}.");
                 else
-                    barByVendorCodes.Add(codeWithRow.value, barcode);
+                    barcodeByVendor.Add(codeWithRow.value, barcode);
             }
             //vendorcodes.ToDictionary(k => k.value, v => GetStringFromCell(cells[v.row, _cfs.BarcodeColumnNumber]));
+            return barcodeByVendor;
+        }
 
-
-            return rows.Select(x => new ResultTableRow()
-            {
-                VendorCode2 = x.VendorCode2,
-                Count = x.Count,
-                Name = x.Name,
-                Barcode = GetBarcode(barByVendorCodes, x),
-            }).ToList();
+        private List<Color> LoadColorSuffixes(ExcelPackage package)
+        {
+            var cells = GetCells(package, _cfs.ColorWorksheetName);
+            List<(int row, string value)> colorWithRow = LoadAllCellsFromColumn(cells, _cfs.ColorColumnNumber);
+            int sfxNum = _cfs.ColorSuffixColumnNumber;
+            return colorWithRow
+                .Select(x => new Color(x.value, GetStringFromCell(cells[x.row, sfxNum])))
+                .ToList();
         }
 
         private string GetBarcode(Dictionary<string, string> barByVendorCodes, ProductItem x)
@@ -55,5 +86,7 @@ namespace ExcelParser.Providers
                 return barcode.PadLeft(_barcodeLength, '0');
             return _defaultBarcode;
         }
+
+        private record Color(string Name, string Suffix);
     }
 }
