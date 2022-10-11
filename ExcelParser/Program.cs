@@ -31,7 +31,8 @@ try
             secondProvider.AppendItems(products);
             thirdProvider.AppendBarcodesByColors(products);
             List<ResultTableRow> resultRows = groupProvider.ApplyGrouping(products.SelectMany(x=>x.Items));
-
+            resultRows = resultRows.OrderBy(x => x.Name).ToList()
+                ;
             string fileNameWithoutExtention = Path.GetFileNameWithoutExtension(fileName);
             if (settings.SolutionDocument.OutExcel)
                 excelWriter.Write(resultRows, fileNameWithoutExtention);
