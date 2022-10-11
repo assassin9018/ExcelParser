@@ -8,7 +8,7 @@ namespace ExcelParser.Writers;
 internal class ResultDmWriter
 {
     private const string Extention = ".dm";
-    private static readonly string EmptyBarCode = string.Concat(Enumerable.Range(0, 13).Select(x=>'0').ToArray());
+    private static readonly string EmptyBarCode = string.Concat(Enumerable.Range(0, 13).Select(x => '0').ToArray());
     private readonly SolutionDocument _settings;
     private readonly CsvConfiguration _configuration;
 
@@ -25,13 +25,13 @@ internal class ResultDmWriter
     {
         string fileName = GetFileName(sourceFileName);
         DateTime generationTime = DateTime.Now;
-        
+
         using FileStream fs = File.Create(fileName);
         using TextWriter textWriter = new StreamWriter(fs);
         using var writer = new CsvWriter(textWriter, _configuration);
         WriteCount(writer, rows.Count + 2);
         WriteLoadMode(writer, generationTime);
-        WriteTeplate(writer,rows.Count + 2);
+        WriteTeplate(writer);
         WriteProductRows(writer, generationTime, fileName, rows);
     }
 
@@ -78,37 +78,48 @@ internal class ResultDmWriter
         writer.NextRecord();
     }
 
-    private void WriteTeplate(CsvWriter writer, int unknownValue)
+    private void WriteTeplate(CsvWriter writer)
     {
-        //7;Перемещение;ПеремещениеТоваров;
-        //1 - 1;
-        //4 - 0;0;0;0;0;
-        //2 - 1;1;
-        //4 - 0;0;0;0;0;
-        //1 - 1;
-        //2 - 0;0;
-        //2 - 1;1;
-        //20 - 0;0;0;0; 0;0;0;0; 0;0;0;0; 0;0;0;0; 0;0;0;0;
-        //1 - 2;
-        //24 - 0;0;0;0; 0;0;0;0; 0;0;0;0; 0;0;0;0; 0;0;0;0; 0;0;0;0; 0;0;0;0;
-        //2 - ;;
-        //7 - 0;0;0;0;0;0;0;
-        writer.WriteField(unknownValue);
-        writer.WriteField("Перемещение");
-        writer.WriteField("ПеремещениеТоваров");
+        //1;
+        writer.WriteField(1);
+        //Заказ;
+        writer.WriteField("Заказ");
+        //ЗаказКлиента;
+        writer.WriteField("ЗаказКлиента");
+        //1;
         AddIdenticalValues(writer, 1, 1);
-        AddIdenticalValues(writer, 5, 0);
-        AddIdenticalValues(writer, 2, 1);
-        AddIdenticalValues(writer, 5, 0);
-        AddIdenticalValues(writer, 1, 1);
-        AddIdenticalValues(writer, 2, 0);
-        AddIdenticalValues(writer, 2, 1);
-        AddIdenticalValues(writer, 20, 0);
+        //0;0;0;
+        AddIdenticalValues(writer, 3, 0);
+        //2;
         AddIdenticalValues(writer, 1, 2);
-        AddIdenticalValues(writer, 28, 0);
+        //0;
+        AddIdenticalValues(writer, 1, 0);
+        //1;1;
+        AddIdenticalValues(writer, 2, 1);
+        //2;
+        AddIdenticalValues(writer, 1, 2);
+        //0;0;0;0;
+        AddIdenticalValues(writer, 4, 0);
+        //1;
+        AddIdenticalValues(writer, 1, 1);
+        //0;0;
+        AddIdenticalValues(writer, 2, 0);
+        //1;1;
+        AddIdenticalValues(writer, 2, 1);
+        //0;0;0;0; 0;0;0;0; 0;0;0;0; 0;0;0;0; 0;0;0;0; 0;0;0;0; 0;0;0;0; 0;0;0;0; 0;0;0;0;0; 0;0;0;0;0;
+        AddIdenticalValues(writer, 42, 0);
+        //1;
+        AddIdenticalValues(writer, 1, 1);
+        //0;0;0;0;0;0;
+        AddIdenticalValues(writer, 6, 0);
+        //;;
         AddIdenticalValues(writer, 2, "");
-        AddIdenticalValues(writer, 7, 0);
-        AddIdenticalValues(writer, 1, "");
+        //0;0;0;0; 0;0;0;0; 0;
+        AddIdenticalValues(writer, 9, 0);
+        //[];
+        AddIdenticalValues(writer, 1, "[]");
+        //0;0;0;0; 0;0;0;0; 0;0;0;
+        AddIdenticalValues(writer, 11, 0);
         writer.NextRecord();
     }
 
@@ -116,7 +127,7 @@ internal class ResultDmWriter
         ICollection<ResultTableRow> rows)
     {
         //1;S;8U-b0380245-9e62-11ea-979a-341a4c11505600000000-0000-0000-0000-000000000000;5201409809378;;;4;4;
-        
+
         int i = 1;
         foreach (var row in rows)
         {
@@ -145,8 +156,8 @@ internal class ResultDmWriter
     {
         string dir = Path.GetDirectoryName(_settings.DmFolder) ?? string.Empty;
         string fileName = $"19102020184919_v83_Doc_БПРЦ-{_settings.Iterator.ToString().PadLeft(6, '0')}";
-        string fullName = Path.Combine(dir, fileName + Extention); 
-        
+        string fullName = Path.Combine(dir, fileName + Extention);
+
         if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
             Directory.CreateDirectory(dir);
         if (File.Exists(fullName))
