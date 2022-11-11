@@ -1,5 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-using ExcelParser;
+﻿using ExcelParser;
 using ExcelParser.Models;
 using ExcelParser.Providers;
 using ExcelParser.Writers;

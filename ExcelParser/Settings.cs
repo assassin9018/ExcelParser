@@ -75,7 +75,7 @@ namespace ExcelParser
         {
             FodlerName = "Orders\\";
             VendorCodeColumnNumber = 3;
-            ColorColumnNumber = 11;
+            ColorColumnNumber = 10;
             WorksheetName = "Фасады";
             WordsFilter = new()
             {

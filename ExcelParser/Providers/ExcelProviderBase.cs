@@ -6,13 +6,11 @@ namespace ExcelParser.Providers
     {
         protected static ExcelRange GetCells(ExcelPackage package, string? worksheetName)
         {
-            return worksheetName is null ?
-                package.Workbook.Worksheets.First().Cells :
-                package.Workbook.Worksheets.First(x
-                        =>x.Name.Equals(worksheetName, StringComparison.CurrentCultureIgnoreCase))
-                    .Cells;
+            return worksheetName is null ? package.Workbook.Worksheets.First().Cells
+                : package.Workbook.Worksheets
+                .First(x => x.Name.Equals(worksheetName, StringComparison.CurrentCultureIgnoreCase)).Cells;
         }
-        
+
         protected static List<(int row, string value)> LoadAllCellsFromColumn(ExcelRange cells, int column)
         {
             return cells.Where(x => x.Start.Column == column)
@@ -30,13 +28,13 @@ namespace ExcelParser.Providers
             if (excelRange.Value is string str && int.TryParse(str.Trim(), out val))
                 return val;
 
-            return - 1;
+            return -1;
         }
 
 
         protected static string GetStringFromCell(ExcelRange cell)
         {
-            if(cell.Value is string str)
+            if (cell.Value is string str)
                 return str.Trim();
 
             if (cell.Value is double dbl)

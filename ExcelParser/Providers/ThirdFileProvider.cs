@@ -26,10 +26,10 @@ namespace ExcelParser.Providers
             var cips = _cfs.ColoredItemsPrefixes;
             foreach (var product in products)
             {
-                Color? color = colorSuffixes.FirstOrDefault(x=>x.Name.Equals(product.Color, StringComparison.OrdinalIgnoreCase));
-                if(color is null)
+                Color? color = colorSuffixes.FirstOrDefault(x => x.Name.Equals(product.Color, StringComparison.OrdinalIgnoreCase));
+                if (color is null)
                     continue;
-                
+
                 var items = product.Items;
                 for (int i = 0; i < items.Count; i++)
                 {
@@ -57,14 +57,13 @@ namespace ExcelParser.Providers
 
             //ZSKHS40 артикул совпадает
             Dictionary<string, string> barcodeByVendor = new();
-            foreach (var codeWithRow in vendorcodes)
+            foreach (var (row, value) in vendorcodes)
             {
-                string barcode = GetStringFromCell(cells[codeWithRow.row, _cfs.BarcodeColumnNumber]);
-                if (barcodeByVendor.TryGetValue(codeWithRow.value, out string existed))
-                    Console.WriteLine(
-                        $"Для артикула {codeWithRow.value} штрих-код уже сохранён. Использован - {existed}, пропущен - {barcode}.");
+                string barcode = GetStringFromCell(cells[row, _cfs.BarcodeColumnNumber]);
+                if (barcodeByVendor.TryGetValue(value, out string? existed))
+                    Console.WriteLine($"Для артикула {value} штрих-код уже сохранён. Использован - {existed}, пропущен - {barcode}.");
                 else
-                    barcodeByVendor.Add(codeWithRow.value, barcode);
+                    barcodeByVendor.Add(value, barcode);
             }
             //vendorcodes.ToDictionary(k => k.value, v => GetStringFromCell(cells[v.row, _cfs.BarcodeColumnNumber]));
             return barcodeByVendor;
@@ -82,7 +81,7 @@ namespace ExcelParser.Providers
 
         private string GetBarcode(Dictionary<string, string> barByVendorCodes, ProductItem x)
         {
-            if (barByVendorCodes.TryGetValue(x.VendorCode2, out string barcode))
+            if (barByVendorCodes.TryGetValue(x.VendorCode2, out string? barcode))
                 return barcode.PadLeft(_barcodeLength, '0');
             return _defaultBarcode;
         }

@@ -26,8 +26,8 @@
     
     internal class Product
     {
-        public string VendorCode1 { get; init; }
-        public string Color { get; init; }
-        public List<ProductItem> Items { get; init; }
+        public string VendorCode1 { get; init; } = string.Empty;
+        public string Color { get; init; } = string.Empty;
+        public List<ProductItem> Items { get; init; } = new();
     }
 }

@@ -4,7 +4,7 @@ namespace ExcelParser.Providers;
 
 internal class GroupedByVendorCode2Provider
 {
-    internal List<ResultTableRow> ApplyGrouping(IEnumerable<ProductItem> items)
+    public List<ResultTableRow> ApplyGrouping(IEnumerable<ProductItem> items)
     {
         return items
             .GroupBy(kvp => kvp.VendorCode2, kvp => kvp)

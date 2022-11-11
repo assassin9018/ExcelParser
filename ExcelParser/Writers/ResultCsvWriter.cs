@@ -30,9 +30,9 @@ internal class ResultDmWriter
         using TextWriter textWriter = new StreamWriter(fs);
         using var writer = new CsvWriter(textWriter, _configuration);
         WriteCount(writer, rows.Count + 2);
-        WriteLoadMode(writer, generationTime);
+        WriteLoadMode(writer, sourceFileName, generationTime);
         WriteTeplate(writer);
-        WriteProductRows(writer, generationTime, fileName, rows);
+        WriteProductRows(writer, rows);
     }
 
     private static void WriteCount(CsvWriter writer, int count)
@@ -41,7 +41,7 @@ internal class ResultDmWriter
         writer.NextRecord();
     }
 
-    private void WriteLoadMode(CsvWriter writer, DateTime generationTime)
+    private void WriteLoadMode(CsvWriter writer, string sourceFileName, DateTime generationTime)
     {
         //+;dk8#b038024c-9e62-11ea-979a-341a4c115056;БПРЦ-000167;2020-05-25 02:10:10.000;БПРЦ-000167;;;;
         //РежимЗагрузкиФайла
@@ -49,7 +49,7 @@ internal class ResultDmWriter
         //ИдентификаторДокумента
         writer.WriteField(Guid.NewGuid());
         //НомерДокумента
-        string bprc = $"БПРЦ-{_settings.Iterator.ToString().PadLeft(6, '0')}";
+        string bprc = $"{sourceFileName}-{_settings.Iterator.ToString().PadLeft(6, '0')}";
         writer.WriteField(bprc);
         //ДатаДокумента
         writer.WriteField($"{generationTime:yyyy-MM-dd hh:mm:ss}.000");
@@ -61,24 +61,12 @@ internal class ResultDmWriter
         writer.WriteField("");
         //Склад
         writer.WriteField("");
-        // //ИНН
-        //writer.WriteField("");
-        // //РодительскийДокумент
-        // writer.WriteField("");
-        // //IDРодительского
-        // writer.WriteField("");
-        // //ТипЛогикиГрупповогоДокумента
-        // writer.WriteField("");
-        // //Приоритет
-        // writer.WriteField("");
-        // //Склад2
-        // writer.WriteField("");
         //Пустое поле чтобы появилась точка с запятой
         writer.WriteField("");
         writer.NextRecord();
     }
 
-    private void WriteTeplate(CsvWriter writer)
+    private static void WriteTeplate(CsvWriter writer)
     {
         //1;
         writer.WriteField(1);
@@ -123,8 +111,7 @@ internal class ResultDmWriter
         writer.NextRecord();
     }
 
-    private static void WriteProductRows(CsvWriter writer, DateTime generationTime, string fileName,
-        ICollection<ResultTableRow> rows)
+    private static void WriteProductRows(CsvWriter writer, ICollection<ResultTableRow> rows)
     {
         //1;S;8U-b0380245-9e62-11ea-979a-341a4c11505600000000-0000-0000-0000-000000000000;5201409809378;;;4;4;
 
@@ -155,7 +142,7 @@ internal class ResultDmWriter
     private string GetFileName(string sourceFileName)
     {
         string dir = Path.GetDirectoryName(_settings.DmFolder) ?? string.Empty;
-        string fileName = $"19102020184919_v83_Doc_БПРЦ-{_settings.Iterator.ToString().PadLeft(6, '0')}";
+        string fileName = $"19102020184919_v83_Doc_БПРЦ-{sourceFileName}{_settings.Iterator.ToString().PadLeft(6, '0')}";
         string fullName = Path.Combine(dir, fileName + Extention);
 
         if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))

@@ -5,7 +5,7 @@ namespace ExcelParser.Writers
 {
     internal class ResultExcelWriter
     {
-        private SolutionDocument _settings;
+        private readonly SolutionDocument _settings;
 
         public ResultExcelWriter(Settings settings)
         {
