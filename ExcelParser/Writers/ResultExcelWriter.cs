@@ -1,32 +1,47 @@
 ﻿using ExcelParser.Models;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 
 namespace ExcelParser.Writers
 {
     internal class ResultExcelWriter
     {
-        private readonly SolutionDocument _settings;
+        protected readonly SolutionDocument Settings;
 
         public ResultExcelWriter(Settings settings)
         {
-            _settings = settings.SolutionDocument;
+            Settings = settings.SolutionDocument;
         }
 
         public void Write(IEnumerable<ResultTableRow> rows, string sourceFileName)
         {
             using var package = new ExcelPackage();
-            ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(_settings.WorksheetName);
+            ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(Settings.WorksheetName);
 
+            int iterator = BeforeWrite(worksheet, 1);
+            iterator = WriteBody(worksheet, rows, iterator);
+            AfterWrite(worksheet, iterator);
+
+            for (int i = 1; i <= 5; i++)
+                worksheet.Column(i).AutoFit();
+
+
+            string dir = Path.GetDirectoryName(GetResultDir()) ?? string.Empty;
+            if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+            string fileName = GetFileName(sourceFileName, dir);
+            if (File.Exists(fileName))
+                File.Delete(fileName);
+
+
+            package.SaveAs(fileName);
+        }
+
+        protected virtual int WriteBody(ExcelWorksheet worksheet, IEnumerable<ResultTableRow> rows, int iterator)
+        {
+            int start = iterator;
             var cells = worksheet.Cells;
-            cells[1, 1].Value = _settings.VendorCode2Header;
-            cells[1, 2].Value = _settings.NameHeader;
-            cells[1, 3].Value = _settings.CountHeader;
-            cells[1, 4].Value = _settings.BarcodeHeader;
 
-            for (int i = 1; i <= 4; i++)
-                worksheet.Column(i).StyleName = "Text";
-
-            int iterator = 2;
             foreach (var row in rows)
             {
                 cells[iterator, 1].Value = row.VendorCode2;
@@ -36,24 +51,40 @@ namespace ExcelParser.Writers
                 iterator++;
             }
 
-            for (int i = 1; i <= 5; i++)
-                worksheet.Column(i).AutoFit();
-
-            string dir = Path.GetDirectoryName(_settings.ExcelFolder) ?? string.Empty;
-            if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
-            string fileName = GetFileName(sourceFileName, dir);
-            if (File.Exists(fileName))
-                File.Delete(fileName);
-
-            package.SaveAs(fileName);
+            int end = iterator;
+            var border = cells[start, 1, end, 5].Style.Border;
+            border.Bottom.Style = ExcelBorderStyle.Thick;
+            border.Top.Style = ExcelBorderStyle.Thick;
+            border.Left.Style = ExcelBorderStyle.Thick;
+            border.Right.Style = ExcelBorderStyle.Thick;
+            return iterator;
         }
+
+        protected virtual int BeforeWrite(ExcelWorksheet worksheet, int iterator)
+        {
+            var cells = worksheet.Cells;
+            
+            cells[iterator, 1].Value = Settings.VendorCode2Header;
+            cells[iterator, 2].Value = Settings.NameHeader;
+            cells[iterator, 3].Value = Settings.CountHeader;
+            cells[iterator, 4].Value = Settings.BarcodeHeader;
+
+            for (int i = 1; i <= 5; i++)
+                worksheet.Column(i).StyleName = "Text";
+            return ++iterator;
+        }
+
+        protected virtual int AfterWrite(ExcelWorksheet worksheet, int iterator)
+            => iterator;
+
+        protected virtual string GetResultDir()
+            => Settings.ExcelFolder;
 
         private string GetFileName(string sourceFileName, string dir)
         {
-            string prefix = _settings.SolutionFileNamePrefix;
+            string prefix = Settings.SolutionFileNamePrefix;
             string timeStamp = $" {DateTime.Now:dd.MM.yyyy HH-mm-ss}";
-            string suffix = _settings.SolutionFileNameSuffix;
+            string suffix = Settings.SolutionFileNameSuffix;
             return Path.Combine(dir, prefix + sourceFileName + timeStamp + suffix) + ".xlsx";
         }
     }

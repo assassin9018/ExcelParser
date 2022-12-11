@@ -15,6 +15,7 @@ try
     GroupedByVendorCode2Provider groupProvider = new();
     ThirdFileProvider thirdProvider = new(settings);
     ResultExcelWriter excelWriter = new(settings);
+    ReportExcelWriter reportWriter = new(settings);
     ResultDmWriter csvWriter = new(settings);
 
     string ordersFolder = Path.Combine(Directory.GetCurrentDirectory(), settings.FirstDocument.FodlerName);
@@ -35,6 +36,8 @@ try
             string fileNameWithoutExtention = Path.GetFileNameWithoutExtension(fileName);
             if (settings.SolutionDocument.OutExcel)
                 excelWriter.Write(resultRows, fileNameWithoutExtention);
+            if(settings.SolutionDocument.OutReport)
+                reportWriter.Write(resultRows, fileNameWithoutExtention);
             if (settings.SolutionDocument.OutDm)
                 csvWriter.Write(resultRows, fileNameWithoutExtention);
             Console.ForegroundColor = ConsoleColor.Green;

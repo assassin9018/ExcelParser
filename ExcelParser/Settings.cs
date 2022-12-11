@@ -115,6 +115,7 @@ namespace ExcelParser
     {
         public bool OutExcel { get; set; } = true;
         public bool OutDm { get; set; } = true;
+        public bool OutReport { get; set; } = true;
         public int BarcodeLength { get; set; } = 12;
         public string WorksheetName { get; set; } = "Todo add name";
         public string VendorCode2Header { get; set; } = "Артикул 2";
@@ -122,6 +123,7 @@ namespace ExcelParser
         public string CountHeader { get; set; } = "Количество";
         public string BarcodeHeader { get; set; } = "Штрих-код";
         public string ExcelFolder { get; set; } = "ExcelSolutions\\";
+        public string ReportFolder { get; set; } = "Reports\\";
         public string DmFolder { get; set; } = "DmSolutions\\";
         public string SolutionFileNamePrefix { get; set; } = "S.";
         public string SolutionFileNameSuffix { get; set; } = "_";
