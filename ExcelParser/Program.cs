@@ -17,10 +17,12 @@ try
     ResultExcelWriter excelWriter = new(settings);
     ReportExcelWriter reportWriter = new(settings);
     ResultDmWriter csvWriter = new(settings);
+    AreaWriter areaWriter = new AreaWriter(settings);
 
-    string ordersFolder = Path.Combine(Directory.GetCurrentDirectory(), settings.FirstDocument.FodlerName);
+    string ordersFolder = Path.Combine(Directory.GetCurrentDirectory(), settings.FirstDocument.FolderName);
     var filesForParsing = Directory.EnumerateFiles(ordersFolder)
-        .Where(x => supportedExtentions.Any(s => s.Equals(Path.GetExtension(x), StringComparison.CurrentCultureIgnoreCase)));
+        .Where(x => supportedExtentions.Any(s =>
+            s.Equals(Path.GetExtension(x), StringComparison.CurrentCultureIgnoreCase)));
 
     foreach (var fileName in filesForParsing)
     {
@@ -30,16 +32,17 @@ try
             List<Product> products = firstProvider.LoadVendorCodes(fileName);
             secondProvider.AppendItems(products);
             thirdProvider.AppendBarcodesByColors(products);
-            List<ResultTableRow> resultRows = groupProvider.ApplyGrouping(products.SelectMany(x=>x.Items));
-            resultRows = resultRows.OrderBy(x => x.Name).ToList()
-                ;
+            List<ResultTableRow> resultRows = groupProvider.ApplyGrouping(products.SelectMany(x => x.Items));
+            resultRows = resultRows.OrderBy(x => x.Name).ToList();
             string fileNameWithoutExtention = Path.GetFileNameWithoutExtension(fileName);
             if (settings.SolutionDocument.OutExcel)
-                excelWriter.Write(resultRows, fileNameWithoutExtention);
-            if(settings.SolutionDocument.OutReport)
+                excelWriter.WriteDelimited(resultRows, fileNameWithoutExtention);
+            if (settings.SolutionDocument.OutReport)
                 reportWriter.Write(resultRows, fileNameWithoutExtention);
             if (settings.SolutionDocument.OutDm)
                 csvWriter.Write(resultRows, fileNameWithoutExtention);
+            if (settings.SolutionDocument.OutTotalArea)
+                areaWriter.Write(resultRows, fileNameWithoutExtention);
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Файл - {fileName} обработан.");
             File.Delete(fileName);
@@ -53,6 +56,7 @@ try
             Console.WriteLine(ex.Message);
         }
     }
+
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("Работа завершена!");
 }
@@ -62,6 +66,7 @@ catch (Exception ex)
     Console.WriteLine("Работа завершена с ошибкой!");
     Console.WriteLine(ex.Message);
 }
+
 Console.ReadKey();
 
 

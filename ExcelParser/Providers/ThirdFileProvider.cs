@@ -20,13 +20,14 @@ namespace ExcelParser.Providers
         {
             using var package = new ExcelPackage(_cfs.FileName);
 
-            var barcodeByVendor = LoadBarcodesDictionary(package);
+            var barcodeByVendor = LoadBarcodesAndSizesDictionary(package);
             var colorSuffixes = LoadColorSuffixes(package);
 
             var cips = _cfs.ColoredItemsPrefixes;
             foreach (var product in products)
             {
-                Color? color = colorSuffixes.FirstOrDefault(x => x.Name.Equals(product.Color, StringComparison.OrdinalIgnoreCase));
+                Color? color = colorSuffixes.FirstOrDefault(x =>
+                    x.Name.Equals(product.Color, StringComparison.OrdinalIgnoreCase));
                 if (color is null)
                     continue;
 
@@ -43,29 +44,33 @@ namespace ExcelParser.Providers
             {
                 var items = product.Items;
                 for (int i = 0; i < items.Count; i++)
-                    items[i] = items[i] with { Barcode = GetBarcode(barcodeByVendor, items[i]) };
-
+                {
+                    var value = ExtractValue(barcodeByVendor, items[i]);
+                    items[i] = items[i] with { Barcode = value.barcode, Area = value.area };
+                }
             }
         }
 
-        private Dictionary<string, string> LoadBarcodesDictionary(ExcelPackage package)
+        private Dictionary<string, (string barcode, int area)> LoadBarcodesAndSizesDictionary(ExcelPackage package)
         {
             var cells = GetCells(package, _cfs.BarcodeWorksheetName);
 
             int column = _cfs.VendorCode2ColumnNumber;
-            List<(int row, string value)> vendorcodes = LoadAllCellsFromColumn(cells, column);
+            var vendorcodes = LoadAllCellsFromColumn(cells, column);
 
-            //ZSKHS40 артикул совпадает
-            Dictionary<string, string> barcodeByVendor = new();
+            Dictionary<string, (string barcode, int area)> barcodeByVendor = new();
             foreach (var (row, value) in vendorcodes)
             {
                 string barcode = GetStringFromCell(cells[row, _cfs.BarcodeColumnNumber]);
-                if (barcodeByVendor.TryGetValue(value, out string? existed))
-                    Console.WriteLine($"Для артикула {value} штрих-код уже сохранён. Использован - {existed}, пропущен - {barcode}.");
+                int width = TryGetIntFromCell(cells[row, _cfs.WidthColumnNumber]);
+                int height = TryGetIntFromCell(cells[row, _cfs.HeightColumnNumber]);
+                if (barcodeByVendor.TryGetValue(value, out var existed))
+                    Console.WriteLine(
+                        $"Для артикула {value} штрих-код уже сохранён. Использован - {existed}, пропущен - {barcode}.");
                 else
-                    barcodeByVendor.Add(value, barcode);
+                    barcodeByVendor.Add(value, (barcode, width * height));
             }
-            //vendorcodes.ToDictionary(k => k.value, v => GetStringFromCell(cells[v.row, _cfs.BarcodeColumnNumber]));
+
             return barcodeByVendor;
         }
 
@@ -79,11 +84,12 @@ namespace ExcelParser.Providers
                 .ToList();
         }
 
-        private string GetBarcode(Dictionary<string, string> barByVendorCodes, ProductItem x)
+        private (string barcode, int area) ExtractValue(
+            Dictionary<string, (string barcode, int area)> barAndAreaByVendorCodes, ProductItem x)
         {
-            if (barByVendorCodes.TryGetValue(x.VendorCode2, out string? barcode))
-                return barcode.PadLeft(_barcodeLength, '0');
-            return _defaultBarcode;
+            if (barAndAreaByVendorCodes.TryGetValue(x.VendorCode2, out var value))
+                return (value.barcode.PadLeft(_barcodeLength, '0'), value.area);
+            return (_defaultBarcode, 0);
         }
 
         private record Color(string Name, string Suffix);

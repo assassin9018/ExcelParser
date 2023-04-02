@@ -6,7 +6,7 @@ using System.Text.Unicode;
 
 namespace ExcelParser
 {
-    internal class Settings
+    public class Settings
     {
         private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.General)
         {
@@ -65,31 +65,21 @@ namespace ExcelParser
 
     public class FirstDocument
     {
-        public string FodlerName { get; set; }
-        public int VendorCodeColumnNumber { get; set; }
-        public string? WorksheetName { get; set; }
-        public List<string> WordsFilter { get; set; }
-        public int ColorColumnNumber { get; set; }
-
-        public FirstDocument()
+        public string FolderName { get; set; }= "Orders\\";
+        public int VendorCodeColumnNumber { get; set; }= 3;
+        public string? WorksheetName { get; set; }= "Фасады";
+        public int ColorColumnNumber { get; set; }= 10;
+        public List<string> WordsFilter { get; set; } = new()
         {
-            FodlerName = "Orders\\";
-            VendorCodeColumnNumber = 3;
-            ColorColumnNumber = 10;
-            WorksheetName = "Фасады";
-            WordsFilter = new()
-            {
-                "Категория в базе не найдена Материал не найден",
-                "Артикул"
-            };
-        }
+            "Категория в базе не найдена Материал не найден",
+            "Артикул"
+        };
     }
 
     public class SecondDocument
     {
         public string FileName { get; set; } = "Examples\\2.xlsx";
         public string? WorksheetName { get; set; } = null;
-
         public int VendorCode1ColumnNumber { get; set; } = 1;
         public int VendorCode2ColumnNumber { get; set; } = 2;
         public int NameColumnNumber { get; set; } = 3;
@@ -99,12 +89,11 @@ namespace ExcelParser
     public class ThirdDocument
     {
         public string FileName { get; set; } = "Examples/3.xlsx";
-        
         public string? BarcodeWorksheetName { get; set; } = null;
         public int VendorCode2ColumnNumber { get; set; } = 2;
         public int BarcodeColumnNumber { get; set; } = 4;
-        
-        
+        public int WidthColumnNumber { get; set; } = 5;
+        public int HeightColumnNumber { get; set; } = 5;
         public string? ColorWorksheetName { get; set; } = "Цвета";
         public int ColorColumnNumber { get; set; } = 1;
         public int ColorSuffixColumnNumber { get; set; } = 3;
@@ -116,6 +105,7 @@ namespace ExcelParser
         public bool OutExcel { get; set; } = true;
         public bool OutDm { get; set; } = true;
         public bool OutReport { get; set; } = true;
+        public bool OutTotalArea { get; set; } = true;
         public int BarcodeLength { get; set; } = 12;
         public string WorksheetName { get; set; } = "Todo add name";
         public string VendorCode2Header { get; set; } = "Артикул 2";

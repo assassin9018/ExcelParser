@@ -12,6 +12,8 @@ internal class GroupedByVendorCode2Provider
             {
                 VendorCode2 = grp.Key,
                 Name = grp.First().Name,
+                Color = grp.First().Color,
+                Area = grp.First().Area,
                 Count = grp.Sum(x => x.Count),
                 Barcode = grp.First().Barcode
             }).ToList();
